@@ -1,0 +1,239 @@
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<!-- CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    
+<style>
+    #widget-body {
+      background: -webkit-linear-gradient(to right, #eecda3, #ef629f);
+      background: linear-gradient(to right, #eecda3, #ef629f);
+      min-height: 100vh;
+      font-size: 11px;
+  }
+  #widget-table .table tr th, .table tr td{ font-size: 11px; padding: 4px;}
+</style>
+
+</head>
+
+<body id="widget-body">
+
+<div class="px-3 px-lg-0 pt-3">
+  <!-- For demo purpose -->
+
+  <div class="pb-3">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 p-0 bg-white rounded shadow-sm mb-0">
+          <div class="table-responsive" id="widget-table">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="border-0 bg-light">
+                      <div class="p-2 px-3 text-uppercase">Product Name</div>
+                    </th>
+                    <th scope="col" class="border-0 bg-light">
+                      <div class="p-2 px-3 text-uppercase">Code</div>
+                    </th>
+                    <th scope="col" class="border-0 bg-light">
+                      <div class="py-2 text-uppercase">Price per unit</div>
+                    </th>
+                    <th scope="col" class="border-0 bg-light">
+                      <div class="py-2 text-uppercase">Quantity</div>
+                    </th>
+
+                    <th scope="col" class="border-0 bg-light">
+                      <div class="py-2 text-uppercase">Total</div>
+                    </th>
+                   
+                  </tr>
+                </thead>
+                <tbody id="all-cart-products">
+                </tbody>
+              </table>
+              <div class="col-lg-12">
+                <div class="bg-light rounded-pill px-1 py-1 text-uppercase font-weight-bold">Order summary </div>
+                <div class="p-1">
+                 
+                  <ul class="list-unstyled mb-4" id="order-summary">
+                  </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-12">
+              <span id="error" style="color: red"></span>
+              <div class="p-1">
+              
+              <div class="row">
+                <div class="col-5">
+                  <input type="text" class="form-control" id="code" name="code" placeholder="Product code">
+                </div>
+                 <div class="col-3">
+                  <input type="number" min="1" class="form-control" id="quantity" name="quantity" value="1" placeholder="Quantity">
+                </div>
+                <div class="col-4">
+                  <button type="button" onclick="addTocart(this.form)" class="btn btn-primary"><i class="fa fa-cart-plus" aria-hidden="true"></i>
+                  </button>
+                  <button class="btn btn-primary ml-1"  onclick="clearAllCart()"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                </div>
+              </div>
+           
+          </div>
+        </div>
+         </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+
+
+<script>
+  
+  function addTocart(form){
+    var visitor_id = setSessionId();
+    document.getElementById("error").innerText= '';
+    var code = document.getElementById("code").value;
+    var quantity = document.getElementById("quantity").value? document.getElementById("quantity").value : 1;
+    if(code != undefined && code != ''){
+        var http = new XMLHttpRequest();
+        var url = 'api_add_to_cart.php';
+        var params = 'code='+code+'&quantity='+quantity+'&visitor_id='+visitor_id;
+        http.open('POST', url, true);
+
+        //Send the proper header information along with the request
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+        http.onreadystatechange = function() {//Call a function when the state changes.
+            if(http.readyState == 4 && http.status == 200 ) {
+              var response = JSON.parse(http.responseText);
+              if(response.status == 200)
+              {
+                getCartProducts();
+                document.getElementById("code").value = '';
+                document.getElementById("quantity").value = 1;
+              }else{
+                  document.getElementById("error").innerText= response.message;
+              }
+            }
+        }
+        http.send(params);
+    }else{
+      document.getElementById("error").innerText= 'Please enter the product code!';
+    }
+  }
+
+
+  function getCartProducts(){
+        var visitor_id = setSessionId();
+        var http = new XMLHttpRequest();
+        var url = 'api_cart_products.php?visitor_id='+visitor_id;
+        http.open('GET', url, true);
+        //Send the proper header information along with the request
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        http.onreadystatechange = function() {//Call a function when the state changes.
+            if(http.readyState == 4 && http.status == 200) {
+              if(http.responseText){
+                showCartData(JSON.parse(http.responseText));
+              }
+            }
+        }
+        http.send();
+  }
+
+  getCartProducts();
+
+  function showCartData(data){
+    showOrderSummary(data.result);
+    var htm = '';
+    for (var i = 0; i < data.result.products.length ; i++ ) {
+      var element = data.result.products[i];
+           htm += '<tr>\
+                  <th scope="row" class="border-0">\
+                    <div class="p-2">\
+                      <div class="ml-3 d-inline-block align-middle">\
+                     '+element.name+'\
+                      </div>\
+                    </div>\
+                  </th>\
+                  <th scope="row" class="border-0">\
+                    <div class="p-2">\
+                      <div class="ml-3 d-inline-block align-middle">\
+                        '+element.code+'\
+                      </div>\
+                    </div>\
+                  </th>\
+                  <td class="border-0 align-middle"><strong>$'+element.price+'</strong></td>\
+                  <td class="border-0 align-middle"><strong>'+element.quantity+'</strong></td>\
+                 <td class="border-0 align-middle"><strong>$'+Math.round(element.price * element.quantity) +'</strong></td>\
+                </tr>';
+    }
+    document.getElementById("all-cart-products").innerHTML = htm;
+  }
+
+
+  function showOrderSummary(summary_data){
+    
+    var summary = '<li class="d-flex justify-content-between py-3 border-bottom">\
+                    <strong class="text-muted">Order Subtotal </strong>\
+                    <strong>$'+summary_data.sub_total+'</strong>\
+                  </li>\
+                  <li class="d-flex justify-content-between py-3 border-bottom">\
+                    <strong class="text-muted">Shipping and handling</strong>\
+                    <strong>$'+summary_data.delivery_charge+'</strong>\
+                  </li>\
+                  <li class="d-flex justify-content-between py-3 border-bottom">\
+                    <strong class="text-muted">Offer Discount</strong>\
+                    <strong>$'+summary_data.discount+'</strong>\
+                  </li>\
+                  <li class="d-flex justify-content-between py-3 border-bottom">\
+                    <strong class="text-muted">Total</strong>\
+                    <strong>$'+summary_data.total+'</strong>\
+                  </li>';
+    document.getElementById("order-summary").innerHTML = summary;
+  }
+
+
+  function clearAllCart(){
+    var visitor_id = setSessionId();
+    var params = 'visitor_id='+visitor_id;
+    document.getElementById("error").innerText= '';
+    document.getElementById("code").value = '';
+    document.getElementById("quantity").value = 1;
+    var http = new XMLHttpRequest();
+    var url = 'api_clear_all_cart.php';
+   
+    http.open('POST', url, true);
+    //Send the proper header information along with the request
+    http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+    http.onreadystatechange = function() {//Call a function when the state changes.
+        if(http.readyState == 4 && http.status == 200) {
+           getCartProducts();
+        }
+    }
+    http.send(params);
+  }
+
+
+  function setSessionId(){
+    if(getSessionId() == '' || getSessionId() == undefined){
+      var milliseconds = new Date().getTime();
+      sessionStorage.setItem("visitor_id", "visitor_"+milliseconds);
+      return getSessionId();
+    }
+    return getSessionId();
+  }
+
+  function getSessionId(){
+    return  sessionStorage.getItem("visitor_id");
+  }
+  
+</script>
