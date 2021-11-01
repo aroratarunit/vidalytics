@@ -14,8 +14,7 @@ class Database
     {
         if (self::$init===TRUE)return;
         self::$init = TRUE;
-        self::$conn = new mysqli("localhost", "root", "dots@123", "acme");
+        self::$conn = new mysqli("localhost", "username", "password", "databasename");
     }
 }
-
 ?>
