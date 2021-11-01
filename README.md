@@ -9,34 +9,26 @@
 ### Project checkout flow
 Clone the entire repository on your local server using the command
 
-git clone https://github.com/dashrathdots/acme.git
+git clone https://github.com/aroratarunit/vidalytics.git
 
-Say the above is cloned out in a folder say `acme`.
+Say the above is cloned out in a folder say `vidalytics`.
 Execute the following command to go in the checked out project folder
 
 ## Migrate the Database
 
-- Create Database 'acme' and import the acme.sql
+- Create Database 'acme' and import the db.sql
 - Configure the Database credentials in the connection.php file.
-
 
 ### Run the project 
 - Hit the below to run the project on your local server.
-```
-http://localhost/acme/
-```
-
+/////
+http://localhost/vidalytics/ or deploy on any server like https://www.hostname.com .
 
 ## Third party library for UI
   - Bootstrap 4.3.1
 
-
 ### Widget module
 
-- Checkout into the widget branch.
-``` 
-	git checkout widget 
-```
 - File descriptions:-
 	- Apis:-
 		- api_add_to_cart.php (POST) - This api used to add product to the cart.
@@ -49,11 +41,8 @@ http://localhost/acme/
 
 ### Access the widget.
 	- Include the widget.js script into your root index.html file.
-```
-<script src="http://host.com/acme/widget.js"></script>
-```
-
-
-
-
- 
+//////	
+<script src="https://www.hostname.com/widget.js"></script>
+//////
+www.hostname.com can be replaced with any host on which widget.js is hosted.
+www.hostname.com should also be replaced in widget.html too. 
