@@ -100,7 +100,7 @@
     var quantity = document.getElementById("quantity").value? document.getElementById("quantity").value : 1;
     if(code != undefined && code != ''){
         var http = new XMLHttpRequest();
-        var url = 'api_add_to_cart.php';
+        var url = 'api/index.php?action=add_to_cart';
         var params = 'code='+code+'&quantity='+quantity+'&visitor_id='+visitor_id;
         http.open('POST', url, true);
 
@@ -130,7 +130,7 @@
   function getCartProducts(){
         var visitor_id = setSessionId();
         var http = new XMLHttpRequest();
-        var url = 'api_cart_products.php?visitor_id='+visitor_id;
+        var url = 'api/index.php?action=cart_products&visitor_id='+visitor_id;
         http.open('GET', url, true);
         //Send the proper header information along with the request
         http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
@@ -208,7 +208,7 @@
     document.getElementById("code").value = '';
     document.getElementById("quantity").value = 1;
     var http = new XMLHttpRequest();
-    var url = 'api_clear_all_cart.php';
+    var url = 'api/index.php?action=clear_cart';
    
     http.open('POST', url, true);
     //Send the proper header information along with the request
