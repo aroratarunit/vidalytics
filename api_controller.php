@@ -34,14 +34,15 @@ class ApiProduct
 
 			$result = $this->conn->query($sql);
 			if ($result->num_rows > 0) {
-				$result =  mysqli_fetch_all($result , MYSQLI_ASSOC);
-				foreach ($result as $key => $value) {
-					$all_carts['products'][$key] = $value;
-					$total_cost = $total_cost+ ($value['price'] * $value['quantity']);
-					if($value['is_offer']){
-						$offer_products[$value['product_id']] = isset($offer_products[$value['product_id']]) ? ($offer_products[$value['product_id']] + $value['quantity']) :  $value['quantity'];
-						$offer_products_price[$value['product_id']] = $value['price'];
+				$key = 0;
+				while($row = $result->fetch_assoc()){
+					$all_carts['products'][$key] = $row;
+					$total_cost = $total_cost+ ($row['price'] * $row['quantity']);
+					if($row['is_offer']){
+						$offer_products[$row['product_id']] = isset($offer_products[$row['product_id']]) ? ($offer_products[$row['product_id']] + $row['quantity']) :  $row['quantity'];
+						$offer_products_price[$row['product_id']] = $row['price'];
 					}
+					$key++;
 				}
 
 				$all_carts['discount'] = $this->applyOffer($offer_products,$offer_products_price);
@@ -221,5 +222,4 @@ class ApiProduct
 	    return $ipaddress;
 	}
 }
-
 ?>
